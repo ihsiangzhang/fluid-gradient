@@ -54,18 +54,23 @@
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      gap: 10px;
-      padding: 10px 16px;
+      gap: 8px;
+      padding: 8px 14px;
       background: rgba(0,0,0,0.55);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border-radius: 16px;
+      border-radius: 14px;
       border: 1px solid rgba(255,255,255,0.1);
       z-index: 10;
+      max-width: 90vw;
+      overflow-x: auto;
+      scrollbar-width: none;
     }
+    #switcher::-webkit-scrollbar { display: none; }
     .swatch {
-      width: 36px; height: 36px;
-      border-radius: 10px;
+      width: 30px; height: 30px;
+      min-width: 30px;
+      border-radius: 8px;
       cursor: pointer;
       border: 2px solid transparent;
       transition: border-color 0.25s, transform 0.2s;
@@ -359,6 +364,83 @@
           [0.28, 0.30, 0.34],  // gunmetal
         ],
         preview: ['#38404d','#596169','#8c8f8c','#ada699','#474d57'],
+      },
+      {
+        name: 'Starry Night',
+        colors: [
+          [0.10, 0.15, 0.38],  // deep swirl blue
+          [0.20, 0.35, 0.60],  // mid sky blue
+          [0.35, 0.55, 0.70],  // light swirl teal
+          [0.85, 0.82, 0.35],  // star yellow
+          [0.15, 0.25, 0.18],  // dark cypress green
+        ],
+        preview: ['#1a2661','#335999','#598fb3','#d9d159','#26401f'],
+      },
+      {
+        name: 'Sunflowers',
+        colors: [
+          [0.90, 0.78, 0.22],  // bright yellow
+          [0.75, 0.58, 0.15],  // golden ochre
+          [0.55, 0.38, 0.12],  // brown seed
+          [0.82, 0.72, 0.45],  // pale straw
+          [0.35, 0.42, 0.18],  // stem green
+        ],
+        preview: ['#e6c738','#c09426','#8c611f','#d1b873','#596b2e'],
+      },
+      {
+        name: 'Wheatfield',
+        colors: [
+          [0.78, 0.68, 0.20],  // golden wheat
+          [0.60, 0.50, 0.12],  // dark wheat
+          [0.12, 0.18, 0.42],  // stormy blue sky
+          [0.30, 0.38, 0.15],  // green path
+          [0.45, 0.25, 0.12],  // brown road
+        ],
+        preview: ['#c7ad33','#99801f','#1f2e6b','#4d6126','#73401f'],
+      },
+      {
+        name: 'Self-Portrait',
+        colors: [
+          [0.22, 0.38, 0.48],  // teal blue background
+          [0.30, 0.48, 0.55],  // light teal
+          [0.72, 0.45, 0.22],  // orange beard
+          [0.55, 0.35, 0.18],  // warm brown
+          [0.62, 0.60, 0.55],  // grey hat
+        ],
+        preview: ['#38617a','#4d7a8c','#b8733a','#8c592e','#9e998c'],
+      },
+      {
+        name: 'Almond Blossom',
+        colors: [
+          [0.30, 0.68, 0.65],  // turquoise sky
+          [0.40, 0.75, 0.72],  // light turquoise
+          [0.88, 0.85, 0.75],  // white petals
+          [0.35, 0.50, 0.38],  // branch green
+          [0.25, 0.58, 0.55],  // deep teal
+        ],
+        preview: ['#4dada6','#66bfb8','#e0d9bf','#598061','#42948c'],
+      },
+      {
+        name: 'Bandaged Ear',
+        colors: [
+          [0.82, 0.30, 0.12],  // vermillion red
+          [0.72, 0.22, 0.10],  // dark red
+          [0.22, 0.30, 0.15],  // dark green coat
+          [0.78, 0.62, 0.32],  // skin ochre
+          [0.18, 0.18, 0.15],  // black fur hat
+        ],
+        preview: ['#d14d1f','#b8381a','#384d26','#c79e52','#2e2e26'],
+      },
+      {
+        name: 'Starry Swirl',
+        colors: [
+          [0.15, 0.30, 0.72],  // vivid blue
+          [0.25, 0.45, 0.82],  // bright sky blue
+          [0.90, 0.85, 0.25],  // bright star yellow
+          [0.10, 0.20, 0.50],  // deep blue
+          [0.12, 0.15, 0.10],  // dark cypress
+        ],
+        preview: ['#264db8','#4073d1','#e6d940','#1a3380','#1f261a'],
       },
     ];
 
