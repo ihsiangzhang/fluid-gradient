@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fluid Gradient</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #111;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    #canvas-wrap {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas { border-radius: 24px; }
+    #overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+      gap: 20px;
+    }
+    #overlay svg {
+      width: 260px;
+      height: auto;
+      filter: drop-shadow(0 2px 12px rgba(0,0,0,0.3));
+    }
+    #overlay .tagline {
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      font-size: 14px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      filter: drop-shadow(0 1px 6px rgba(0,0,0,0.4));
+    }
+    #switcher {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      padding: 10px 16px;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+      z-index: 10;
+    }
+    .swatch {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.25s, transform 0.2s;
+      position: relative;
+    }
+    .swatch:hover { transform: scale(1.12); }
+    .swatch.active { border-color: #fff; }
+    .swatch .tooltip {
+      position: absolute;
+      bottom: 44px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .swatch:hover .tooltip { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div id="canvas-wrap">
+    <canvas id="gradient"></canvas>
+    <div id="overlay">
+      <svg width="543" height="80" viewBox="0 0 543 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g clip-path="url(#clip0_1_304)">
+          <path d="M298.136 67.1652H292.17V57.9155H298.136C301.831 57.9155 305.564 56.9944 307.969 54.4347C310.376 51.875 311.284 47.9485 311.284 44.0241C311.284 40.0996 310.414 36.1731 307.969 33.6155C305.528 31.0559 301.831 30.1347 298.136 30.1347C294.441 30.1347 290.707 31.0559 288.298 33.6155C285.891 36.1752 284.983 40.0996 284.983 44.0241V82.0118H274.517V20.9211H284.983V24.8116H286.902C287.11 24.5718 287.318 24.368 287.528 24.1643C290.147 21.7744 294.156 20.9211 298.098 20.9211C304.274 20.9211 310.446 22.4578 314.494 26.7239C318.539 30.9901 319.969 37.5421 319.969 44.0623C319.969 50.5825 318.503 57.1005 314.494 61.4006C310.482 65.7007 304.274 67.1694 298.136 67.1694V67.1652Z" fill="white"/>
+          <path d="M138.868 22.5666H144.832V31.8162H138.868C135.17 31.8162 131.439 32.7374 129.032 35.2971C126.625 37.8567 125.719 41.7833 125.719 45.7077C125.719 49.6321 126.591 53.5565 129.032 56.1162C131.473 58.6759 135.17 59.597 138.868 59.597C142.565 59.597 146.298 58.6759 148.705 56.1162C151.112 53.5565 152.018 49.6321 152.018 45.7077V7.68604H162.482V68.8127H152.018V64.9223H150.1C149.889 65.16 149.681 65.3659 149.471 65.5696C146.854 67.9574 142.843 68.8127 138.902 68.8127C132.727 68.8127 126.553 67.2782 122.508 63.0121C118.462 58.7459 117.032 52.1918 117.032 45.6737C117.032 39.1557 118.496 32.6355 122.508 28.3354C126.553 24.0693 132.727 22.5666 138.868 22.5666Z" fill="white"/>
+          <path d="M214.976 44.8804V48.6011H187.106V41.1959H205.593C205.175 38.5003 204.199 35.9746 202.454 34.1302C199.943 31.4687 196.07 30.5135 192.234 30.5135C188.399 30.5135 184.526 31.4687 182.015 34.1302C179.504 36.7918 178.595 40.8542 178.595 44.8826C178.595 48.911 179.502 53.0052 182.015 55.6328C184.526 58.2604 188.397 59.2516 192.234 59.2516C196.072 59.2516 199.943 58.2965 202.454 55.6328C202.802 55.2571 203.116 54.8475 203.43 54.4379H213.756C212.85 57.647 211.419 60.5484 209.256 62.8003C205.071 67.2023 198.619 68.8069 192.234 68.8069C185.85 68.8069 179.398 67.2363 175.212 62.8003C171.027 58.3644 169.492 51.6065 169.492 44.8826C169.492 38.1586 170.993 31.3668 175.212 26.9648C179.434 22.5628 185.85 20.9583 192.234 20.9583C198.619 20.9583 205.071 22.5289 209.256 26.9648C213.476 31.4007 214.976 38.1586 214.976 44.8826V44.8804Z" fill="white"/>
+          <path d="M267.507 44.8804V48.6011H239.637V41.1959H258.124C257.704 38.5003 256.73 35.9746 254.985 34.1302C252.474 31.4687 248.601 30.5135 244.765 30.5135C240.93 30.5135 237.057 31.4687 234.546 34.1302C232.035 36.7918 231.126 40.8542 231.126 44.8826C231.126 48.911 232.033 53.0052 234.546 55.6328C237.057 58.2604 240.93 59.2516 244.765 59.2516C248.601 59.2516 252.474 58.2965 254.985 55.6328C255.335 55.2571 255.647 54.8475 255.959 54.4379H266.287C265.379 57.647 263.948 60.5484 261.785 62.8003C257.6 67.2023 251.148 68.8069 244.765 68.8069C238.383 68.8069 231.929 67.2363 227.743 62.8003C223.558 58.3644 222.023 51.6065 222.023 44.8826C222.023 38.1586 223.524 31.3668 227.743 26.9648C231.965 22.5628 238.381 20.9583 244.765 20.9583C251.15 20.9583 257.6 22.5289 261.785 26.9648C266.007 31.4007 267.507 38.1586 267.507 44.8826V44.8804Z" fill="white"/>
+          <path d="M349.793 68.8111C356.178 68.8111 362.628 67.89 366.813 65.2624C370.999 62.6348 372.535 58.6403 372.535 54.6819C372.535 50.7236 371.033 46.6951 366.813 44.1015C362.628 41.5079 356.176 40.5506 349.793 40.5506C347.07 40.5506 344.559 40.175 342.781 39.1859C341.002 38.1607 340.34 36.6262 340.34 35.0896C340.34 33.5529 340.968 31.9844 342.781 30.9932C344.559 29.9681 347.316 29.6285 350.035 29.6285C352.754 29.6285 355.511 30.0042 357.294 30.9932C359.073 32.0184 359.735 33.5529 359.735 35.0896H370.373C370.373 31.1291 369.014 27.1028 365.213 24.5091C361.412 21.9155 355.586 20.9583 349.795 20.9583C344.005 20.9583 338.181 21.8794 334.378 24.5091C330.577 27.1367 329.214 31.1291 329.214 35.0896C329.214 39.0501 330.575 43.0764 334.378 45.67C338.179 48.2636 344.003 49.2209 349.795 49.2209C352.795 49.2209 356.11 49.5965 358.096 50.5856C360.087 51.5768 360.783 53.1453 360.783 54.6819C360.783 56.2186 360.087 57.7871 358.096 58.7783C356.11 59.7673 353.075 60.143 350.076 60.143C347.077 60.143 344.005 59.7673 342.051 58.7783C340.098 57.7892 339.364 56.2186 339.364 54.6819H327.085C327.085 58.6424 328.584 62.6687 332.807 65.2624C337.027 67.856 343.411 68.8111 349.795 68.8111H349.793Z" fill="white"/>
+          <path d="M425.063 44.8804V48.6011H397.193V41.1959H415.68C415.264 38.5003 414.285 35.9746 412.543 34.1302C410.027 31.4687 406.158 30.5135 402.319 30.5135C398.479 30.5135 394.61 31.4687 392.099 34.1302C389.588 36.7918 388.684 40.8542 388.684 44.8826C388.684 48.911 389.588 53.0052 392.099 55.6328C394.61 58.2604 398.483 59.2516 402.319 59.2516C406.154 59.2516 410.027 58.2965 412.543 55.6328C412.888 55.2571 413.205 54.8475 413.517 54.4379H423.84C422.932 57.647 421.504 60.5484 419.343 62.8003C415.157 67.2023 408.703 68.8069 402.319 68.8069C395.934 68.8069 389.484 67.2363 385.299 62.8003C381.113 58.3644 379.581 51.6065 379.581 44.8826C379.581 38.1586 381.079 31.3668 385.299 26.9648C389.52 22.5628 395.939 20.9583 402.319 20.9583C408.699 20.9583 415.157 22.5289 419.343 26.9648C423.562 31.4007 425.061 38.1586 425.061 44.8826L425.063 44.8804Z" fill="white"/>
+          <path d="M477.594 44.8804V48.6011H449.724V41.1959H468.211C467.795 38.5003 466.816 35.9746 465.072 34.1302C462.561 31.4687 458.691 30.5135 454.852 30.5135C451.012 30.5135 447.143 31.4687 444.632 34.1302C442.121 36.7918 441.213 40.8542 441.213 44.8826C441.213 48.911 442.121 53.0052 444.632 55.6328C447.143 58.2604 451.017 59.2516 454.852 59.2516C458.687 59.2516 462.561 58.2965 465.072 55.6328C465.422 55.2571 465.734 54.8475 466.05 54.4379H476.374C475.465 57.647 474.037 60.5484 471.876 62.8003C467.689 67.2023 461.236 68.8069 454.852 68.8069C448.468 68.8069 442.017 67.2363 437.832 62.8003C433.647 58.3644 432.11 51.6065 432.11 44.8826C432.11 38.1586 433.608 31.3668 437.832 26.9648C442.051 22.5628 448.47 20.9583 454.852 20.9583C461.234 20.9583 467.686 22.5289 471.876 26.9648C476.096 31.4007 477.594 38.1586 477.594 44.8826V44.8804Z" fill="white"/>
+          <path d="M495.069 7.68604H484.605V68.8127H495.069V7.68604Z" fill="white"/>
+          <path d="M512.932 43.4481L530.09 68.8072H517.149L499.987 43.4481L517.149 23.0725H530.09L512.932 43.4481Z" fill="white"/>
+          <path d="M100.725 9.09596C99.6523 8.57176 99.1915 9.57211 98.5646 10.0788C98.3505 10.2427 98.1693 10.4567 97.988 10.6533C96.4219 12.3264 94.5916 13.425 92.2021 13.2939C88.7074 13.0974 85.7238 14.196 83.0854 16.8694C82.524 13.5735 80.6609 11.6056 77.8259 10.3431C76.3428 9.68787 74.8423 9.03044 73.8026 7.60417C73.0775 6.58853 72.8787 5.45713 72.5162 4.34102C72.2846 3.6683 72.0553 2.98028 71.2799 2.86452C70.439 2.73347 70.1092 3.43896 69.7794 4.02868C68.4602 6.44001 67.9491 9.09596 67.9993 11.7869C68.1151 17.8392 70.6705 22.6597 75.7487 26.0888C76.3253 26.482 76.4739 26.8751 76.2926 27.4496C75.9453 28.6312 75.5347 29.7779 75.1721 30.9595C74.9406 31.7131 74.5955 31.8791 73.7873 31.5492C71.0003 30.3851 68.5934 28.6618 66.466 26.5803C62.8556 23.0878 59.5902 19.2327 55.5189 16.2142C54.5623 15.5087 53.6056 14.8534 52.6162 14.2288C48.4619 10.1946 53.16 6.88121 54.2477 6.48806C55.3857 6.07744 54.6431 4.66646 50.9671 4.68394C47.2912 4.69923 43.9275 5.9311 39.64 7.57141C39.0131 7.81822 38.3535 7.99733 37.6786 8.14585C33.7886 7.4076 29.7479 7.24379 25.5281 7.71994C17.5821 8.60453 11.2349 12.3613 6.56946 18.774C0.964879 26.482 -0.354361 35.2405 1.25974 44.3747C2.95684 54.0025 7.87123 61.9726 15.4219 68.204C23.2522 74.6648 32.2706 77.8318 42.5602 77.2246C48.8092 76.8643 55.7657 76.0277 63.6135 69.3857C65.5923 70.3707 67.6695 70.7639 71.1139 71.0587C73.7677 71.3055 76.3232 70.9277 78.302 70.5171C81.4014 69.8618 81.1873 66.9918 80.0668 66.4654C70.9829 62.2347 72.977 63.9558 71.1642 62.5623C75.7793 57.1019 82.8298 47.3954 85.0052 34.179C85.2193 32.72 85.4923 30.6647 85.4596 29.483C85.4421 28.7622 85.6081 28.4827 86.4315 28.3997C88.7074 28.1376 90.9156 27.5151 92.9447 26.399C98.8311 23.1839 101.205 17.9025 101.764 11.5728C101.847 10.6052 101.747 9.60488 100.725 9.09596ZM49.4338 66.0723C40.6294 59.1506 36.3594 56.8725 34.5968 56.9708C32.9477 57.0691 33.2448 58.9562 33.6073 60.1859C33.9874 61.4003 34.481 62.2369 35.1734 63.3027C35.6517 64.0082 35.9815 65.0566 34.695 65.8451C31.86 67.599 26.9303 65.2554 26.6988 65.1396C20.961 61.7607 16.1645 57.3006 12.7834 51.2002C9.5181 45.3292 7.62223 39.03 7.3099 32.3072C7.2269 30.6843 7.70523 30.1099 9.32152 29.815C11.4489 29.4219 13.6418 29.3389 15.767 29.6512C24.7527 30.9639 32.4017 34.9806 38.8144 41.3453C42.4751 44.9688 45.2446 49.3 48.0971 53.5308C51.1309 58.0236 54.3941 62.3046 58.5506 65.8145C60.0183 67.0442 61.189 67.979 62.3095 68.6693C58.9306 69.0471 53.2911 69.1279 49.4338 66.0766V66.0723ZM53.6536 38.9296C53.6536 38.2088 54.2303 37.6343 54.9554 37.6343C55.1192 37.6343 55.2678 37.6671 55.401 37.7152C55.5823 37.7807 55.7483 37.879 55.8793 38.0275C56.1108 38.2568 56.2419 38.5845 56.2419 38.9296C56.2419 39.6503 55.6653 40.2248 54.9401 40.2248C54.215 40.2248 53.6536 39.6503 53.6536 38.9296ZM66.7609 45.6524C65.92 45.9975 65.0791 46.2924 64.2709 46.3252C63.0172 46.3907 61.6499 45.8818 60.9073 45.2593C59.754 44.2917 58.9284 43.75 58.5833 42.0617C58.4348 41.3409 58.5178 40.2248 58.6488 39.5848C58.9459 38.2066 58.6161 37.322 57.6441 36.5182C56.8535 35.863 55.8466 35.6817 54.7414 35.6817C54.3286 35.6817 53.9507 35.5004 53.6689 35.3541C53.2081 35.1247 52.828 34.5503 53.1906 33.8448C53.3064 33.6155 53.8677 33.0585 53.9988 32.9602C55.4993 32.1062 57.2291 32.3858 58.8301 33.0257C60.3132 33.6329 61.4359 34.7469 63.05 36.3217C64.699 38.2241 64.9961 38.7483 65.9352 40.1767C66.6779 41.2928 67.3528 42.4395 67.8158 43.7522C68.0954 44.5713 67.7328 45.2418 66.7609 45.6524Z" fill="white"/>
+        </g>
+        <defs>
+          <clipPath id="clip0_1_304">
+            <rect width="542.345" height="80" fill="white"/>
+          </clipPath>
+        </defs>
+      </svg>
+      <span class="tagline">Into the unknown</span>
+    </div>
+  </div>
+  <div id="switcher"></div>
+
+  <script id="vs" type="x-shader/x-vertex">
+    attribute vec2 a_pos;
+    void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
+  </script>
+
+  <script id="fs" type="x-shader/x-fragment">
+    precision highp float;
+    uniform float u_time;
+    uniform vec2  u_resolution;
+    uniform vec3  u_c1, u_c2, u_c3, u_c4, u_c5;
+
+    vec3 mod289(vec3 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
+    vec4 mod289(vec4 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
+    vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+    vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+
+    float snoise(vec3 v) {
+      const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+      const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+      vec3 i = floor(v + dot(v, C.yyy));
+      vec3 x0 = v - i + dot(i, C.xxx);
+      vec3 g = step(x0.yzx, x0.xyz);
+      vec3 l = 1.0 - g;
+      vec3 i1 = min(g.xyz, l.zxy);
+      vec3 i2 = max(g.xyz, l.zxy);
+      vec3 x1 = x0 - i1 + C.xxx;
+      vec3 x2 = x0 - i2 + C.yyy;
+      vec3 x3 = x0 - D.yyy;
+      i = mod289(i);
+      vec4 p = permute(permute(permute(
+                i.z + vec4(0.0, i1.z, i2.z, 1.0))
+              + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+              + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+      float n_ = 0.142857142857;
+      vec3 ns = n_ * D.wyz - D.xzx;
+      vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+      vec4 x_ = floor(j * ns.z);
+      vec4 y_ = floor(j - 7.0 * x_);
+      vec4 x  = x_ * ns.x + ns.yyyy;
+      vec4 y  = y_ * ns.x + ns.yyyy;
+      vec4 h  = 1.0 - abs(x) - abs(y);
+      vec4 b0 = vec4(x.xy, y.xy);
+      vec4 b1 = vec4(x.zw, y.zw);
+      vec4 s0 = floor(b0)*2.0 + 1.0;
+      vec4 s1 = floor(b1)*2.0 + 1.0;
+      vec4 sh = -step(h, vec4(0.0));
+      vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+      vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+      vec3 p0 = vec3(a0.xy, h.x);
+      vec3 p1 = vec3(a0.zw, h.y);
+      vec3 p2 = vec3(a1.xy, h.z);
+      vec3 p3 = vec3(a1.zw, h.w);
+      vec4 norm = taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+      p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+      vec4 m = max(0.6 - vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)), 0.0);
+      m = m * m;
+      return 42.0 * dot(m*m, vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+    }
+
+    float fbm(vec3 p) {
+      float v = 0.0, amp = 0.6;
+      vec3 shift = vec3(100.0);
+      for (int i = 0; i < 2; i++) {
+        v += amp * snoise(p);
+        p = p * 2.0 + shift;
+        amp *= 0.4;
+      }
+      return v;
+    }
+
+    float fluidNoise(vec2 uv, float t) {
+      float n1 = fbm(vec3(uv * 0.6, t * 0.06));
+      float n2 = fbm(vec3(uv * 0.6 + 5.2, t * 0.06 + 1.3));
+      vec2 warp1 = vec2(n1, n2) * 0.6;
+      float n3 = fbm(vec3((uv + warp1) * 0.7 + 1.7, t * 0.05 + 3.1));
+      float n4 = fbm(vec3((uv + warp1) * 0.7 + 9.2, t * 0.05 + 5.7));
+      vec2 warp2 = vec2(n3, n4) * 0.5;
+      return fbm(vec3((uv + warp1 + warp2) * 0.5, t * 0.04));
+    }
+
+    vec2 curlish(vec2 uv, float t) {
+      float eps = 0.02;
+      float n  = snoise(vec3(uv * 0.8, t));
+      float nx = snoise(vec3((uv + vec2(eps, 0.0)) * 0.8, t));
+      float ny = snoise(vec3((uv + vec2(0.0, eps)) * 0.8, t));
+      return vec2(-(ny - n) / eps, (nx - n) / eps) * 0.003;
+    }
+
+    float hash(vec2 p) {
+      vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+      p3 += dot(p3, p3.yzx + 33.33);
+      return fract((p3.x + p3.y) * p3.z);
+    }
+
+    float brushStroke(vec2 uv, float angle, float freq) {
+      float c = cos(angle), s = sin(angle);
+      vec2 ruv = vec2(c * uv.x - s * uv.y, s * uv.x + c * uv.y);
+      ruv.x *= 3.0;
+      return snoise(vec3(ruv * freq, 0.0));
+    }
+
+    void main() {
+      vec2 uv = gl_FragCoord.xy / u_resolution;
+      vec2 px = gl_FragCoord.xy;
+      float t = u_time;
+
+      vec2 curl = curlish(uv, t * 0.04);
+      vec2 uvD = uv + curl * 25.0;
+      float f = fluidNoise(uvD, t);
+      float swirl = snoise(vec3(uvD * 0.8 + f * 1.5, t * 0.035)) * 0.5 + 0.5;
+
+      float eps2 = 0.005;
+      float fx = fluidNoise(uvD + vec2(eps2, 0.0), t);
+      float fy = fluidNoise(uvD + vec2(0.0, eps2), t);
+      float angle = atan(fy - f, fx - f);
+
+      float stroke1 = brushStroke(uv, angle, 60.0) * 0.5 + 0.5;
+      float stroke2 = brushStroke(uv, angle + 0.4, 120.0) * 0.5 + 0.5;
+      float stroke3 = brushStroke(uv, angle - 0.3, 200.0) * 0.5 + 0.5;
+      float brushTex = stroke1 * 0.5 + stroke2 * 0.3 + stroke3 * 0.2;
+
+      float n = f * 0.5 + 0.5;
+      vec3 col = mix(u_c1, u_c2, smoothstep(0.2, 0.5, n));
+      col = mix(col, u_c3, smoothstep(0.35, 0.65, n + swirl * 0.25));
+      col = mix(col, u_c4, smoothstep(0.6, 0.85, swirl) * 0.55);
+      col = mix(col, u_c5, smoothstep(0.5, 0.8, n * swirl) * 0.35);
+
+      col *= 0.85 + brushTex * 0.3;
+
+      float impasto = smoothstep(0.7, 0.95, brushTex) * smoothstep(0.5, 0.8, swirl);
+      col += vec3(0.12, 0.10, 0.05) * impasto;
+
+      float hueShift = snoise(vec3(uv * 80.0, t * 0.01)) * 0.06;
+      col.r += hueShift;
+      col.b -= hueShift * 0.5;
+
+      float grain = hash(px + fract(t * 7.0)) * 2.0 - 1.0;
+      col += grain * 0.04;
+
+      float weaveX = sin(px.x * 1.2) * 0.5 + 0.5;
+      float weaveY = sin(px.y * 1.2) * 0.5 + 0.5;
+      col *= 0.97 + weaveX * weaveY * 0.03;
+
+      float vig = 1.0 - smoothstep(0.4, 0.78, length(uv - 0.5));
+      col = mix(col * 0.75, col, vig * 0.35 + 0.65);
+
+      gl_FragColor = vec4(col, 1.0);
+    }
+  </script>
+
+  <script>
+    // ===== Color Themes =====
+    const themes = [
+      {
+        name: 'Aurora',
+        colors: [
+          [0.78, 0.55, 1.0],   // lavender
+          [0.90, 0.55, 1.0],   // pink-purple
+          [0.55, 0.60, 1.0],   // blue-purple
+          [0.50, 0.72, 1.0],   // light blue
+          [0.85, 0.65, 0.95],  // soft pink
+        ],
+        preview: ['#c78cff','#e68cff','#8c99ff','#80b8ff','#d9a6f2'],
+      },
+      {
+        name: 'Starry Night',
+        colors: [
+          [0.06, 0.10, 0.28],  // deep night blue
+          [0.12, 0.22, 0.50],  // cobalt blue
+          [0.18, 0.35, 0.55],  // mid blue water
+          [0.75, 0.68, 0.25],  // golden yellow
+          [0.28, 0.38, 0.22],  // olive green
+        ],
+        preview: ['#0f1a47','#1f3880','#2e598c','#c0ad40','#476138'],
+      },
+      {
+        name: 'Ocean Foam',
+        colors: [
+          [0.10, 0.42, 0.58],  // teal blue
+          [0.22, 0.60, 0.72],  // cerulean
+          [0.85, 0.92, 0.96],  // white foam
+          [0.08, 0.30, 0.45],  // deep ocean
+          [0.45, 0.75, 0.82],  // light aqua
+        ],
+        preview: ['#1a6b94','#3899b8','#d9eaf5','#144d73','#73c0d1'],
+      },
+      {
+        name: 'Still Water',
+        colors: [
+          [0.06, 0.15, 0.30],  // dark navy
+          [0.10, 0.25, 0.45],  // deep blue
+          [0.18, 0.38, 0.58],  // mid steel blue
+          [0.25, 0.48, 0.65],  // slate blue
+          [0.12, 0.20, 0.38],  // muted indigo
+        ],
+        preview: ['#0f264d','#1a4073','#2e6194','#4078a6','#1f3361'],
+      },
+      {
+        name: 'Glacier',
+        colors: [
+          [0.04, 0.08, 0.18],  // near black blue
+          [0.08, 0.16, 0.30],  // dark glacier
+          [0.18, 0.35, 0.50],  // icy blue
+          [0.30, 0.52, 0.62],  // pale glacier
+          [0.06, 0.12, 0.22],  // shadow blue
+        ],
+        preview: ['#0a1430','#14294d','#2e5980','#4d859e','#0f1f38'],
+      },
+      {
+        name: 'Mist',
+        colors: [
+          [0.85, 0.88, 0.92],  // warm white
+          [0.55, 0.65, 0.82],  // periwinkle
+          [0.30, 0.50, 0.80],  // bright blue
+          [0.72, 0.78, 0.88],  // fog grey
+          [0.45, 0.58, 0.85],  // cornflower
+        ],
+        preview: ['#d9e0eb','#8ca6d1','#4d80cc','#b8c7e0','#7394d9'],
+      },
+      {
+        name: 'Saturn',
+        colors: [
+          [0.03, 0.06, 0.10],  // deep space
+          [0.12, 0.18, 0.24],  // dark grey-blue
+          [0.35, 0.50, 0.55],  // ring teal
+          [0.55, 0.62, 0.60],  // pale sage
+          [0.08, 0.12, 0.16],  // charcoal
+        ],
+        preview: ['#080f1a','#1f2e3d','#59808c','#8c9e99','#141f29'],
+      },
+      {
+        name: 'Echo',
+        colors: [
+          [0.22, 0.25, 0.30],  // dark steel
+          [0.35, 0.38, 0.42],  // mid grey
+          [0.55, 0.56, 0.55],  // warm grey
+          [0.68, 0.65, 0.60],  // champagne
+          [0.28, 0.30, 0.34],  // gunmetal
+        ],
+        preview: ['#38404d','#596169','#8c8f8c','#ada699','#474d57'],
+      },
+    ];
+
+    // ===== WebGL Setup =====
+    const canvas = document.getElementById('gradient');
+    const wrap = document.getElementById('canvas-wrap');
+    const gl = canvas.getContext('webgl');
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const cssSize = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.85);
+      canvas.style.width = cssSize + 'px';
+      canvas.style.height = cssSize + 'px';
+      wrap.style.width = cssSize + 'px';
+      wrap.style.height = cssSize + 'px';
+      canvas.width = cssSize * dpr;
+      canvas.height = cssSize * dpr;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function compileShader(type, src) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS))
+        console.error(gl.getShaderInfoLog(s));
+      return s;
+    }
+
+    const prog = gl.createProgram();
+    gl.attachShader(prog, compileShader(gl.VERTEX_SHADER, document.getElementById('vs').textContent));
+    gl.attachShader(prog, compileShader(gl.FRAGMENT_SHADER, document.getElementById('fs').textContent));
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+    const aPos = gl.getAttribLocation(prog, 'a_pos');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+    const uTime = gl.getUniformLocation(prog, 'u_time');
+    const uRes  = gl.getUniformLocation(prog, 'u_resolution');
+    const uColors = [1,2,3,4,5].map(i => gl.getUniformLocation(prog, 'u_c' + i));
+
+    // ===== Color transition state =====
+    let currentColors = themes[0].colors.map(c => [...c]);
+    let targetColors  = themes[0].colors.map(c => [...c]);
+    let transitionProgress = 1.0;
+
+    function lerpColor(a, b, t) {
+      return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t];
+    }
+
+    function setTheme(index) {
+      targetColors = themes[index].colors.map(c => [...c]);
+      transitionProgress = 0.0;
+      document.querySelectorAll('.swatch').forEach((s, i) =>
+        s.classList.toggle('active', i === index));
+    }
+
+    // ===== Build switcher UI =====
+    const switcher = document.getElementById('switcher');
+    themes.forEach((theme, i) => {
+      const el = document.createElement('div');
+      el.className = 'swatch' + (i === 0 ? ' active' : '');
+      const gradient = theme.preview.length >= 3
+        ? `linear-gradient(135deg, ${theme.preview[0]}, ${theme.preview[1]}, ${theme.preview[2]})`
+        : `linear-gradient(135deg, ${theme.preview[0]}, ${theme.preview[1]})`;
+      el.style.background = gradient;
+      el.innerHTML = `<span class="tooltip">${theme.name}</span>`;
+      el.addEventListener('click', () => setTheme(i));
+      switcher.appendChild(el);
+    });
+
+    // ===== Render loop =====
+    function draw(t) {
+      // Smooth color transition
+      if (transitionProgress < 1.0) {
+        transitionProgress = Math.min(1.0, transitionProgress + 0.012);
+        const ease = transitionProgress < 0.5
+          ? 2 * transitionProgress * transitionProgress
+          : 1 - Math.pow(-2 * transitionProgress + 2, 2) / 2;
+        for (let i = 0; i < 5; i++) {
+          currentColors[i] = lerpColor(currentColors[i], targetColors[i], ease > 0.99 ? 1 : 0.06);
+        }
+      }
+
+      for (let i = 0; i < 5; i++) {
+        gl.uniform3f(uColors[i], currentColors[i][0], currentColors[i][1], currentColors[i][2]);
+      }
+
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.uniform1f(uTime, t * 0.001);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      requestAnimationFrame(draw);
+    }
+
+    setTheme(1); // Start with Starry Night
+    transitionProgress = 1.0;
+    currentColors = themes[1].colors.map(c => [...c]);
+    requestAnimationFrame(draw);
+  </script>
+</body>
+</html>
