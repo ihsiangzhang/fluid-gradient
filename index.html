@@ -329,9 +329,9 @@
 
       // Mode: light (mix toward white) or dark (mix toward black)
       if (u_mode > 0.0) {
-        col = mix(vec3(1.0), col, 0.06 * u_mode);
+        col = mix(col, vec3(0.97, 0.97, 0.98), 0.82 * u_mode);
       } else if (u_mode < 0.0) {
-        col = mix(vec3(0.0), col, 0.08 * (-u_mode));
+        col = mix(col, vec3(0.02, 0.02, 0.03), 0.78 * (-u_mode));
       }
 
       gl_FragColor = vec4(col, 1.0);
