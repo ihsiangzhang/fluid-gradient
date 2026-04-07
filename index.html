@@ -329,7 +329,10 @@
 
       // Mode: light (mix toward white) or dark (mix toward black)
       if (u_mode > 0.0) {
-        col = mix(col, vec3(0.97, 0.97, 0.98), 0.82 * u_mode);
+        // Light mode: center nearly pure white, edges retain soft warm tint
+        float center = 1.0 - smoothstep(0.0, 0.6, length(uv - 0.5));
+        float lightMix = mix(0.78, 0.95, center) * u_mode;
+        col = mix(col, vec3(1.0, 0.98, 0.96), lightMix);
       } else if (u_mode < 0.0) {
         col = mix(col, vec3(0.02, 0.02, 0.03), 0.78 * (-u_mode));
       }
