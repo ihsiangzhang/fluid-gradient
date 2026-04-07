@@ -107,6 +107,37 @@
       transition: opacity 0.2s;
     }
     .swatch:hover .tooltip { opacity: 1; }
+    #mode-toggle {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      display: flex;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      overflow: hidden;
+      z-index: 10;
+    }
+    .mode-btn {
+      width: 36px; height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: rgba(255,255,255,0.4);
+      font-size: 14px;
+      transition: background 0.25s, color 0.25s;
+      border: none;
+      background: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .mode-btn:hover { color: rgba(255,255,255,0.7); }
+    .mode-btn.active {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -137,6 +168,17 @@
   </div>
   <div id="switcher"></div>
   <div id="theme-label"></div>
+  <div id="mode-toggle">
+    <button class="mode-btn" data-mode="light" title="Light">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="mode-btn active" data-mode="normal" title="Normal">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 0 0 0 20 7 7 0 0 0 0-20z" fill="currentColor"/></svg>
+    </button>
+    <button class="mode-btn" data-mode="dark" title="Dark">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
 
   <script id="vs" type="x-shader/x-vertex">
     attribute vec2 a_pos;
@@ -148,6 +190,7 @@
     uniform float u_time;
     uniform vec2  u_resolution;
     uniform vec3  u_c1, u_c2, u_c3, u_c4, u_c5;
+    uniform float u_mode; // 0.0 = normal, 1.0 = light, -1.0 = dark
 
     vec3 mod289(vec3 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
     vec4 mod289(vec4 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
@@ -283,6 +326,13 @@
 
       float vig = 1.0 - smoothstep(0.4, 0.78, length(uv - 0.5));
       col = mix(col * 0.75, col, vig * 0.35 + 0.65);
+
+      // Mode: light (mix toward white) or dark (mix toward black)
+      if (u_mode > 0.0) {
+        col = mix(vec3(1.0), col, 0.06 * u_mode);
+      } else if (u_mode < 0.0) {
+        col = mix(vec3(0.0), col, 0.08 * (-u_mode));
+      }
 
       gl_FragColor = vec4(col, 1.0);
     }
@@ -468,7 +518,26 @@
 
     const uTime = gl.getUniformLocation(prog, 'u_time');
     const uRes  = gl.getUniformLocation(prog, 'u_resolution');
+    const uMode = gl.getUniformLocation(prog, 'u_mode');
     const uColors = [1,2,3,4,5].map(i => gl.getUniformLocation(prog, 'u_c' + i));
+
+    // ===== Mode state =====
+    let currentMode = 0.0;  // 0 = normal, 1 = light, -1 = dark
+    let targetMode = 0.0;
+
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.mode;
+        targetMode = mode === 'light' ? 1.0 : mode === 'dark' ? -1.0 : 0.0;
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        // Update overlay colors for light mode
+        const overlay = document.getElementById('overlay');
+        const logoFill = mode === 'light' ? '#222' : '#fff';
+        overlay.querySelectorAll('path').forEach(p => p.setAttribute('fill', logoFill));
+        overlay.querySelector('.tagline').style.color = logoFill;
+      });
+    });
 
     // ===== Color transition state =====
     let currentColors = themes[0].colors.map(c => [...c]);
@@ -514,10 +583,14 @@
         }
       }
 
+      // Smooth mode transition
+      currentMode += (targetMode - currentMode) * 0.05;
+
       for (let i = 0; i < 5; i++) {
         gl.uniform3f(uColors[i], currentColors[i][0], currentColors[i][1], currentColors[i][2]);
       }
 
+      gl.uniform1f(uMode, currentMode);
       gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform1f(uTime, t * 0.001);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
